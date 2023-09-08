@@ -247,18 +247,3 @@ void setWifi(int WIFIMODE){
         break;
   }
 }
-
-void turnWifiAdapter(bool state){
-  if(state){
-    Serial.println("Turning on wifi");
-    WiFi.reconnect();
-    setWifi(0);
-    //WiFi.forceSleepWake();  
-  }else{
-    Serial.println("Turning off wifi");
-    WiFi.disconnect();
-    WiFi.mode(WIFI_OFF);
-    //WiFi.forceSleepBegin();
-    delay(1);
-  }
-}

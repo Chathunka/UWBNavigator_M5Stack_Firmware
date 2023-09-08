@@ -19,49 +19,34 @@ void setup() {
   Serial.begin(115200);
   Serial1.begin(115200, SERIAL_8N1, 33, 32);
   Splash_Screen1();
-  UWB_ui_display(3);
-  #ifdef APWEBSERVER
-    //initAPServer();
+  int COMM_MODE = CommModeSelector();
+  if(COMM_MODE == 1){
+    Serial.println("WiFi mode selected..");
+    #ifdef APWEBSERVER
+      initAPServer();
+    #endif
+  }else if (COMM_MODE == 2){
+    Serial.println("BLE mode selected..");
     initbleserver();
-    delay(1000);
-  #endif
-  
+  }
+  displayQR(COMM_MODE);
+  UWB_ui_display(3);
+  delay(1000);
 }
  
 void loop() {
   M5.update();
   int temp = UWB_Keyscan(UWB_MODE);
-
-  if(UWB_MODE == 0 && temp == 2){
-    if(COMM_MODE == 0){ 
-      UWB_display_mode(0);
-      turnBLEAdapter(TURN_BLE_OFF);
-      turnWifiAdapter(TURN_WIFI_ON);
-      delay(1000);
-      UWB_display_mode_after(0);
-      COMM_MODE = 1;
-    }
-    else{
-      UWB_display_mode(1);
-      turnWifiAdapter(TURN_WIFI_OFF);
-      turnBLEAdapter(TURN_BLE_ON);
-      delay(1000);
-      UWB_display_mode_after(1);
-      COMM_MODE = 0;
-    }
-  }else if(UWB_MODE == 1 && temp == 2){
+  if(UWB_MODE == 1 && temp == 2){
     restartDevice();
   }
-  
   if(temp<2){
     UWB_MODE = temp;
   }
-
   JSONData = UWB_readString(UWB_MODE);
   #ifdef APWEBSERVER
   if(UWB_MODE == 0){
     if(COMM_MODE == 1){
-      setWifi(0); // set wifi AP for now
       updateClients(JSONData);
     }else{
       sendDataBLE(JSONData);

@@ -1,5 +1,7 @@
 #include "init.h"
 
+int commMode = 0;
+
 int UWB_B_NUMBER = 0;
 int UWB_T_NUMBER = 0;
 int UWB_B_COUNT = 0;
@@ -19,7 +21,7 @@ void UWB_display() {
 void UWB_ui_display(int UWB_MODE) {
     M5.Lcd.clear();
     M5.Lcd.fillScreen(WHITE);
-    M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 2, 2, 100, 100, 0, 0, JPEG_DIV_NONE);
+    M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 2, 2, 100, 100, 0, 0, JPEG_DIV_2);
     M5.Lcd.drawString("UWB Navigator", 120, 10, 4);  // UI
     M5.Lcd.setTextColor(WHITE,DARKCYAN);
     M5.Lcd.fillRect(150, 45, 112, 10, DARKCYAN);
@@ -32,15 +34,20 @@ void UWB_ui_display(int UWB_MODE) {
 
     switch (UWB_MODE) {
         case 0:
-            M5.Lcd.setTextColor(BLACK,WHITE);
-            M5.Lcd.drawString(" Mode : ", 155, 89, 4);
-            M5.Lcd.setTextColor(WHITE,BLUE);
-            M5.Lcd.drawString(" BLE ", 254, 89, 4);
-            M5.Lcd.setTextColor(BLACK,WHITE);
-            M5.Lcd.drawString(" Tag ", 25, 215, 4);
+            if(commMode == 1){
+                M5.Lcd.setTextColor(BLACK,WHITE);
+                M5.Lcd.drawString(" Mode : ", 155, 89, 4);
+                M5.Lcd.setTextColor(WHITE,OLIVE);
+                M5.Lcd.drawString(" WIFI ", 250, 89, 4);
+            }else if(commMode == 2){
+                M5.Lcd.setTextColor(BLACK,WHITE);
+                M5.Lcd.drawString(" Mode : ", 155, 89, 4);
+                M5.Lcd.setTextColor(WHITE,BLUE);
+                M5.Lcd.drawString(" BLE ", 254, 89, 4);
+            }
             //menu
             M5.Lcd.setTextColor(WHITE,DARKCYAN);
-            M5.Lcd.drawString("  WIFI  ", 232, 215, 4);
+            M5.Lcd.drawString("Reset", 230, 215, 4);
             break;
         case 1:
             M5.Lcd.setTextColor(BLACK,WHITE);
@@ -51,42 +58,14 @@ void UWB_ui_display(int UWB_MODE) {
             M5.Lcd.setTextColor(BLACK,WHITE);
             M5.Lcd.drawString("Reset", 230, 215, 4);
             break;
-
+        case 3:
+            M5.Lcd.setTextColor(BLACK,WHITE);
+            M5.Lcd.drawString("Please Configure...", 5, 115, 4);
+            break;
+        case 4:
+            break;
     }
     M5.Lcd.setTextColor(BLACK,WHITE);
-}
-
-void UWB_display_mode(int MODE){
-  if(MODE == 0){
-    //menu
-    M5.Lcd.setTextColor(BLACK,WHITE);
-    M5.Lcd.drawString(" WIFI ", 232, 215, 4);
-    delay(500);
-    M5.Lcd.setTextColor(BLACK,WHITE);
-    M5.Lcd.drawString(" Mode : ", 155, 89, 4);
-    M5.Lcd.setTextColor(WHITE,OLIVE);
-    M5.Lcd.drawString(" WIFI ", 250, 89, 4);
-  }else{
-    //menu
-    M5.Lcd.setTextColor(BLACK,WHITE);
-    M5.Lcd.drawString("  BLE   ", 232, 215, 4);
-    delay(500);
-    M5.Lcd.setTextColor(BLACK,WHITE);
-    M5.Lcd.drawString(" Mode : ", 155, 89, 4);
-    M5.Lcd.fillRect(250, 89, 10, 26, WHITE);
-    M5.Lcd.setTextColor(WHITE,BLUE);
-    M5.Lcd.drawString(" BLE ", 254, 89, 4);
-  }
-}
-
-void UWB_display_mode_after(int MODE){
-  if(MODE == 0){
-    M5.Lcd.setTextColor(WHITE,DARKCYAN);
-    M5.Lcd.drawString("  BLE   ", 232, 215, 4);
-  }else{
-    M5.Lcd.setTextColor(WHITE,DARKCYAN);
-    M5.Lcd.drawString("  WIFI   ", 232, 215, 4);
-  }
 }
 
 
@@ -295,6 +274,7 @@ int UWB_Keyscan(int CMODE) {
     }
     if (M5.BtnC.isPressed()) {
       Serial.println("Pressed Button C");
+      restartDevice();
       return 2;
     }
     return 3;
@@ -303,7 +283,7 @@ int UWB_Keyscan(int CMODE) {
 
 void restartDevice(){
   UWB_clear();
-  UWB_ui_display(2);
+  UWB_ui_display(4);
   M5.Lcd.drawString("Restarting >>", 50, 115, 4);
   delay(800);
   M5.Lcd.drawString("Restarting >>>>", 50, 115, 4);
@@ -337,23 +317,78 @@ void Splash_Screen1(){
     Serial.println("An Error has occurred while mounting SPIFFS");
     return;
   }
-  M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 0, 0, 100, 100, 0, 0, JPEG_DIV_8);
+  M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 0, 0, 200, 200, 0, 0, JPEG_DIV_8);
   delay(50);
   M5.Lcd.clear();
-  M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 25, 17, 100, 100, 0, 0, JPEG_DIV_4);
+  M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 12, 7, 200, 200, 0, 0, JPEG_DIV_4);
   delay(50);
   M5.Lcd.clear();
-  M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 55, 35, 100, 100, 0, 0, JPEG_DIV_2);
+  M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 27, 14, 200, 200, 0, 0, JPEG_DIV_2);
   delay(50);
   M5.Lcd.clear();
-  M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 110, 70, 100, 100, 0, 0, JPEG_DIV_NONE);
+  M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 55, 20, 200, 200, 0, 0, JPEG_DIV_NONE);
   delay(500);
   M5.Lcd.clear();
   delay(500);
-  M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 110, 70, 100, 100, 0, 0, JPEG_DIV_NONE);
+  M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 55, 20, 200, 200, 0, 0, JPEG_DIV_NONE);
   delay(500);
   M5.Lcd.clear();
   delay(500);
-  M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 110, 70, 100, 100, 0, 0, JPEG_DIV_NONE);
+  M5.Lcd.drawJpgFile(SPIFFS, "/logo.jpg", 55, 20, 200, 200, 0, 0, JPEG_DIV_NONE);
   delay(1000);
+}
+
+int CommModeSelector(){
+  M5.update();
+  M5.Lcd.drawJpgFile(SPIFFS, "/lpsmall.jpg", 0, 0, 318, 238, 0, 0, JPEG_DIV_NONE);
+  M5.Lcd.setTextColor(WHITE,DARKCYAN);
+  M5.Lcd.drawString(" WiFi ", 25, 210, 4);
+  M5.Lcd.drawString(" BLE ", 240, 210, 4);
+  bool pressed = true;
+  while(pressed){
+    M5.update();
+    Serial.println("onloop");
+    if (M5.BtnA.isPressed()) {
+      Serial.println("Pressed Button WIFI");
+      commMode = 1;
+      M5.Lcd.setTextColor(BLACK,WHITE);
+      M5.Lcd.drawString(" WiFi ", 25, 210, 4);
+      pressed = false;
+    }
+    if (M5.BtnC.isPressed()) {
+      Serial.println("Pressed Button BLE");
+      commMode = 2;
+      M5.Lcd.setTextColor(BLACK,WHITE);
+      M5.Lcd.drawString(" BLE ", 240, 210, 4);
+      pressed = false;
+    }
+    delay(50);
+  }
+  return commMode;
+}
+
+void displayQR(int commMode){
+  M5.Lcd.drawJpgFile(SPIFFS, "/infosm.jpg", 0, 0, 318, 238, 0, 0, JPEG_DIV_NONE);
+  delay(3000);
+
+  if(commMode == 1){
+    M5.Lcd.drawJpgFile(SPIFFS, "/QRWIFIsm.jpg", 0, 0, 318, 238, 0, 0, JPEG_DIV_NONE);
+  }else if(commMode == 2){
+    M5.Lcd.drawJpgFile(SPIFFS, "/QRBLEsm.jpg", 0, 0, 318, 238, 0, 0, JPEG_DIV_NONE);
+  }
+  M5.Lcd.setTextColor(WHITE,DARKCYAN);
+  M5.Lcd.drawString("  OK ", 240, 210, 4);
+
+  bool pressed = true;
+  while(pressed){
+    M5.update();
+    Serial.println("onloop");
+    if (M5.BtnC.isPressed()) {
+      Serial.println("Pressed Button OK");
+      M5.Lcd.setTextColor(BLACK,WHITE);
+      M5.Lcd.drawString("  OK ", 240, 210, 4);
+      pressed = false;
+    }
+    delay(50);
+  }
 }

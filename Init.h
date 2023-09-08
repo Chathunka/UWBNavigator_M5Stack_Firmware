@@ -16,3 +16,5 @@ void UWB_Timer(void);
 void restartDevice(void);
 void Splash_Screen(void);
 void Splash_Screen1(void);
+int CommModeSelector(void);
+void displayQR(int commMode);

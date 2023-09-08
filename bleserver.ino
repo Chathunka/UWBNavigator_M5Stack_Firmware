@@ -5,7 +5,7 @@ BLECharacteristic* pCharacteristic3 = NULL;
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
 
-#define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define SERVICE_UUID         "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID1 "beb5483e-36e1-4688-b7f5-ea07361b26a7"
 #define CHARACTERISTIC_UUID2 "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 #define CHARACTERISTIC_UUID3 "beb5483e-36e1-4688-b7f5-ea07361b26a9"
@@ -117,15 +117,5 @@ void sendDataBLE(String data){
   // connecting
   if (deviceConnected && !oldDeviceConnected) {
       oldDeviceConnected = deviceConnected;
-  }
-}
-
-void turnBLEAdapter(bool state){
-  if(state){
-    Serial.println("Turning on BLE");
-    //initbleserver();
-  }else{
-    //turnOffBLE();
-    Serial.println("Turning off BLE");
   }
 }
